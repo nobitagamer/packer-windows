@@ -1,96 +1,96 @@
 {
-  "builders": [
-    {
-      "type": "virtualbox-iso",
-      "communicator": "winrm",
-      "iso_url": "{{user `iso_url`}}",
-      "iso_checksum_type": "{{user `iso_checksum_type`}}",
-      "iso_checksum": "{{user `iso_checksum`}}",
-      "headless": true,
-      "boot_wait": "2m",
-      "winrm_username": "vagrant",
-      "winrm_password": "vagrant",
-      "winrm_timeout": "6h",
-      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
-      "guest_os_type": "Windows2012_64",
-      "guest_additions_mode": "disable",
-      "disk_size": 61440,
-      "floppy_files": [
-        "{{user `autounattend`}}",
-        "./scripts/disable-winrm.ps1",
-        "./scripts/docker/enable-winrm.ps1",
-        "./scripts/microsoft-updates.bat",
-        "./scripts/win-updates.ps1",
-        "./scripts/oracle-cert.cer"
+  "builders": [{
+    "type": "virtualbox-iso",
+    "communicator": "winrm",
+    "iso_url": "{{user `iso_url`}}",
+    "iso_checksum_type": "{{user `iso_checksum_type`}}",
+    "iso_checksum": "{{user `iso_checksum`}}",
+    "headless": true,
+    "boot_wait": "2m",
+    "winrm_username": "vagrant",
+    "winrm_password": "vagrant",
+    "winrm_timeout": "6h",
+    "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+    "guest_os_type": "Windows2012_64",
+    "guest_additions_mode": "disable",
+    "disk_size": 61440,
+    "export_opts": [
+      "--manifest",
+      "--vsys", "0"
+    ],
+    "format": "ovf",
+    "floppy_files": [
+      "{{user `autounattend`}}",
+      "./scripts/disable-winrm.ps1",
+      "./scripts/docker/enable-winrm.ps1",
+      "./scripts/microsoft-updates.bat",
+      "./scripts/win-updates.ps1",
+      "./scripts/oracle-cert.cer"
+    ],
+    "vboxmanage": [
+      [
+        "modifyvm",
+        "{{.Name}}",
+        "--memory",
+        "2048"
       ],
-      "vboxmanage": [
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--memory",
-          "2048"
-        ],
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--cpus",
-          "2"
-        ]
+      [
+        "modifyvm",
+        "{{.Name}}",
+        "--cpus",
+        "2"
       ]
+    ]
+  }, {
+    "type": "vmware-iso",
+    "format": "vmx",
+    "iso_url": "{{user `iso_url`}}",
+    "iso_checksum_type": "{{user `iso_checksum_type`}}",
+    "iso_checksum": "{{user `iso_checksum`}}",
+    "headless": false,
+    "boot_wait": "2m",
+    "communicator": "winrm",
+    "winrm_username": "vagrant",
+    "winrm_password": "vagrant",
+    "winrm_timeout": "6h",
+    "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+    "guest_os_type": "windows8srv-64",
+    "disk_size": 61440,
+    "vnc_port_min": 5900,
+    "vnc_port_max": 5980,
+    "version": 11,
+    "floppy_files": [
+      "{{user `autounattend`}}",
+      "./scripts/disable-winrm.ps1",
+      "./scripts/docker/enable-winrm.ps1",
+      "./scripts/microsoft-updates.bat",
+      "./scripts/win-updates.ps1"
+    ],
+    "vmx_data": {
+      "RemoteDisplay.vnc.enabled": "false",
+      "RemoteDisplay.vnc.port": "5900",
+      "memsize": "2048",
+      "numvcpus": "2",
+      "scsi0.virtualDev": "lsisas1068",
+      "vhv.enable": "FALSE"
     }
-  ],
-  "provisioners": [
-    {
-      "type": "windows-shell",
-      "scripts": [
-        "./scripts/vm-guest-tools.bat",
-        "./scripts/enable-rdp.bat"
-      ]
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "./scripts/debloat-windows.ps1"
-      ]
-    },
-    {
-      "type": "windows-restart"
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "./scripts/docker/add-docker-group.ps1",
-        "./scripts/docker/install-docker.ps1",
-        "./scripts/docker/docker-pull-async.ps1",
-        "./scripts/docker/open-docker-insecure-port.ps1",
-        "./scripts/docker/remove-docker-key-json.ps1",
-        "./scripts/docker/disable-windows-defender.ps1"
-      ]
-    },
-    {
-      "type": "windows-restart"
-    },
-    {
-      "type": "windows-shell",
-      "scripts": [
-        "./scripts/compile-dotnet-assemblies.bat",
-        "./scripts/uac-enable.bat",
-        "./scripts/compact.bat"
-      ]
-    }
-  ],
-  "post-processors": [
-    {
-      "type": "vagrant",
-      "keep_input_artifact": false,
-      "output": "windows_2016_docker_core_{{.Provider}}.box",
-      "vagrantfile_template": "vagrantfile-windows_2016.template"
-    }
-  ],
+  }],
+  "provisioners": [{
+    "type": "windows-shell",
+    "scripts": [
+      "./scripts/vm-guest-tools.bat",
+      "./scripts/enable-rdp.bat"
+    ]
+  }, {
+    "type": "powershell",
+    "scripts": [
+      "./scripts/debloat-windows.ps1"
+    ]
+  }],
   "variables": {
-    "iso_url": "http://care.dlservice.microsoft.com/dl/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO",
+    "iso_url": "iso/Windows-Server-2016-RTM-x60EN-US.ISO",
     "iso_checksum_type": "md5",
-    "iso_checksum": "70721288BBCDFE3239D8F8C0FAE55F1F",
+    "iso_checksum": "4291ae8a80da37063be8299b243890cb",
     "autounattend": "./answer_files/2016_core/Autounattend.xml"
   }
 }

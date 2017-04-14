@@ -1,0 +1,45 @@
+{
+  "builders": [{
+    "type": "virtualbox-ovf",
+    "format": "ovf",
+    "headless": true,
+    "guest_additions_mode": "disable",
+    "shutdown_command": "c:/windows/system32/sysprep/sysprep.exe /generalize /oobe /quiet /shutdown /unattend:a:/Autounattend.xml",
+    "floppy_files": [
+      "{{user `autounattend`}}"
+    ],
+    "communicator": "winrm",
+    "winrm_username": "vagrant",
+    "winrm_password": "vagrant",
+    "source_path": "output-virtualbox-iso/packer-virtualbox-iso-{{user `timestamps`}}.ovf"
+  }],
+  "provisioners": [{
+    "type": "powershell",
+    "scripts": [
+      "./scripts/docker/add-docker-group.ps1",
+      "./scripts/docker/install-docker.ps1",
+      "./scripts/docker/open-docker-insecure-port.ps1",
+      "./scripts/docker/remove-docker-key-json.ps1",
+      "./scripts/docker/disable-windows-defender.ps1"
+    ]
+  }, {
+    "type": "windows-restart"
+  }, {
+    "type": "windows-shell",
+    "scripts": [
+      "./scripts/compile-dotnet-assemblies.bat",
+      "./scripts/uac-enable.bat",
+      "./scripts/compact.bat"
+    ]
+  }],
+  "post-processors": [{
+    "type": "vagrant",
+    "keep_input_artifact": true,
+    "output": "output-vagrant-box/windows_2016_docker_core_{{.Provider}}.box",
+    "vagrantfile_template": "vagrantfile-windows_2016.template"
+  }],
+  "variables": {
+    "autounattend": "./answer_files/2016_core/Autounattend.xml",
+    "timestamps": "1481295854"
+  }
+}
