@@ -1,0 +1,79 @@
+{
+  "builders": [
+    {
+    "type": "vmware-iso",
+    "format": "vmx",
+    "iso_url": "{{user `iso_url`}}",
+    "iso_checksum_type": "{{user `iso_checksum_type`}}",
+    "iso_checksum": "{{user `iso_checksum`}}",
+    "headless": false,
+    "boot_wait": "2m",
+    "communicator": "winrm",
+    "winrm_username": "vagrant",
+    "winrm_password": "vagrant",
+    "winrm_timeout": "6h",
+    "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+    "guest_os_type": "windows8srv-64",
+    "disk_size": 61440,
+    "vnc_port_min": 5900,
+    "vnc_port_max": 5980,
+    "version": 11,
+    "floppy_files": [
+      "{{user `autounattend`}}",
+      "./scripts/disable-screensaver.ps1",
+      "./scripts/disable-winrm.ps1",
+      "./scripts/docker/enable-winrm.ps1",
+	  "./scripts/docker/2016/install-containers-feature.ps1",
+      "./scripts/microsoft-updates.bat",
+      "./scripts/win-updates.ps1"
+    ],
+    "vmx_data": {
+      "RemoteDisplay.vnc.enabled": "false",
+      "RemoteDisplay.vnc.port": "5900",
+      "memsize": "4096",
+      "numvcpus": "4",
+      "scsi0.virtualDev": "lsisas1068",
+      "vhv.enable": "FALSE"
+    }
+  }],
+  "provisioners": [
+   {
+      "type": "windows-shell",
+      "scripts": [
+        "./scripts/vm-guest-tools.bat",
+        "./scripts/enable-rdp.bat"
+      ]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "./scripts/docker/add-docker-group.ps1",
+        "./scripts/docker/2016/install-docker.ps1",
+        "./scripts/docker/docker-pull-async.ps1",
+        "./scripts/docker/open-docker-insecure-port.ps1",
+        "./scripts/docker/remove-docker-key-json.ps1",
+        "./scripts/docker/disable-windows-defender.ps1"
+      ]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "windows-shell",
+      "scripts": [
+        "./scripts/compile-dotnet-assemblies.bat",
+        "./scripts/uac-enable.bat",
+        "./scripts/compact.bat"
+      ]
+    }
+  ],
+  "variables": {
+    "iso_url": "packer_cache/en_windows_server_2016_x64_dvd_9718492.iso",
+    "iso_checksum_type": "md5",
+    "iso_checksum": "e02d2e482b0f3dab915435e9040c13b4",
+    "autounattend": "./answer_files/2016_core/Autounattend.xml"
+  }
+}

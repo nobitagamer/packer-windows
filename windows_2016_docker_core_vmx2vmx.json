@@ -3,10 +3,7 @@
     {
       "type": "vmware-vmx",
       "headless": true,
-      "shutdown_command": "c:/windows/system32/sysprep/sysprep.exe /generalize /oobe /quiet /shutdown /unattend:a:/Autounattend.xml",
-      "floppy_files": [
-        "{{user `autounattend`}}"
-      ],
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
       "communicator": "winrm",
       "winrm_username": "vagrant",
       "winrm_password": "vagrant",
@@ -37,16 +34,7 @@
       ]
     }
   ],
-  "post-processors": [
-    {
-      "type": "vagrant",
-      "keep_input_artifact": true,
-      "output": "output-vagrant-box/windows_2016_docker_core_{{.Provider}}.box",
-      "vagrantfile_template": "vagrantfile-windows_2016_docker.template"
-    }
-  ],
   "variables": {
-    "autounattend": "./answer_files/2016_core/Autounattend.xml",
-    "timestamps": ""
+    "timestamps": "1481295854"
   }
 }

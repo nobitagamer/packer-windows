@@ -13,4 +13,4 @@ ECHO Timestamps: %TIMESTAMPS%
 SET TMP=%~dp0packer_cache
 mkdir "%TMP%" > nul
 
-packer build -color=true -var 'timestamps=%TIMESTAMPS%' windows_2016_docker_core_ovf2box.json
+packer build -color=true -var "timestamps=%TIMESTAMPS%" windows_2016_docker_core_ovf2box.json

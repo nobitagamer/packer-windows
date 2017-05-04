@@ -1,0 +1,22 @@
+{
+  "builders": [
+    {
+      "type": "null",
+      "communicator": "winrm",
+      "winrm_host": "192.168.244.134",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "powershell",
+      "scripts": [
+        "./scripts/docker/docker-pull-async.ps1",
+        "./scripts/docker/open-docker-insecure-port.ps1",
+        "./scripts/docker/remove-docker-key-json.ps1",
+        "./scripts/docker/disable-windows-defender.ps1"
+      ]
+    }
+  ]
+}

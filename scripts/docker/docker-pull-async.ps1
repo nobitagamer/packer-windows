@@ -14,3 +14,6 @@ function DockerPull {
 
 DockerPull microsoft/windowsservercore
 DockerPull microsoft/nanoserver
+DockerPull microsoft/aspnet
+DockerPull microsoft/dotnet:runtime-nanoserver
+DockerPull microsoft/dotnet-framework

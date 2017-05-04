@@ -28,10 +28,12 @@
       ]
     },
     {
+      "type": "windows-restart"
+    },
+    {
       "type": "windows-shell",
       "scripts": [
         "./scripts/uac-enable.bat",
-        "./scripts/set-winrm-automatic.bat",
         "./scripts/compile-dotnet-assemblies.bat",
         "./scripts/compact.bat"
       ]
@@ -42,11 +44,26 @@
       "type": "vagrant",
       "keep_input_artifact": true,
       "output": "output-vagrant-box/windows_2016_docker_core_{{.Provider}}.box",
-      "vagrantfile_template": "vagrantfile-windows_2016.template"
+      "vagrantfile_template": "vagrantfile-windows_2016_docker.template"
+    },
+    {
+      "type": "atlas",
+      "only": [
+        "virtualbox-ovf"
+      ],
+      "token": "{{user `atlas_token`}}",
+      "artifact": "{{user `atlas_username`}}/{{user `atlas_name`}}",
+      "artifact_type": "vagrant.box",
+      "metadata": {
+        "provider": "virtualbox"
+      }
     }
   ],
   "variables": {
     "autounattend": "./answer_files/2016_core/Autounattend.xml",
-    "timestamps": "1481295854"
+    "atlas_username": "{{env `ATLAS_USERNAME`}}",
+    "atlas_name": "{{env `ATLAS_NAME`}}",
+    "atlas_token": "{{env `ATLAS_TOKEN`}}",
+    "timestamps": ""
   }
 }
